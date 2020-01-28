@@ -2,6 +2,7 @@
 
 
 #include "Expression.h"
+#include <iostream>
 
 
 namespace ga_gp
@@ -13,7 +14,7 @@ namespace ga_gp
         Individual(std::array<std::array<Expression, Expression_size>, Color_type_count> & expressions) noexcept;
 
 
-        std::array<std::vector<std::vector<uint8_t>>, Color_type_count> get_points(size_t width, size_t height) const noexcept;
+        std::array<std::vector<std::vector<uint8_t>>, Color_type_count> get_points(size_t width, size_t height, float step = 1.f) const noexcept;
 
         void try_mutate(float probability) noexcept;
 
@@ -22,8 +23,8 @@ namespace ga_gp
         // TODO cross with two child
 
     public:
-        // TODO friend std::ostream & operator<<(std::ostream & os, Individual const & individual) noexcept;
-
+        friend std::ostream & operator<<(std::ostream & os, Individual const & individual) noexcept;
+        friend std::istream & operator>>(std::istream & os, Individual & individual) noexcept;
 
     private:
         void generate() noexcept;

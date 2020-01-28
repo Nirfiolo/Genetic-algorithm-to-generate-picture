@@ -152,7 +152,7 @@ namespace ga_gp
 
 
 
-    std::vector<std::vector<uint8_t>> get_value_array_from_expression(std::array<Expression, Expression_size> const & expression, size_t width, size_t height) noexcept
+    std::vector<std::vector<uint8_t>> get_value_array_from_expression(std::array<Expression, Expression_size> const & expression, size_t width, size_t height, float step) noexcept
     {
         std::vector<std::vector<uint8_t>> result(height, std::vector<uint8_t>(width, Max_color));
         std::vector<std::vector<float>> value_array(height, std::vector<float>(width, 0.f));
@@ -161,10 +161,10 @@ namespace ga_gp
         float max_value = -INFINITY;
 
         float y = 0.f;
-        for (size_t i = 0; i < height; ++i, y += 1.f)
+        for (size_t i = 0; i < height; ++i, y += step)
         {
             float x = 0.f;
-            for (size_t j = 0; j < width; ++j, x += 1.f)
+            for (size_t j = 0; j < width; ++j, x += step)
             {
                 float const current = get_value(expression, x, y);
 

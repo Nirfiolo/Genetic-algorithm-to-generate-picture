@@ -33,7 +33,7 @@ namespace ga_gp
         // relu 
     };
 
-    static constexpr size_t Expression_size{ 10 };
+    static constexpr size_t Expression_size{ 50 };
 
 
     Expression get_rand_expression() noexcept;
@@ -42,5 +42,5 @@ namespace ga_gp
 
     float get_value(std::array<Expression, Expression_size> const & expression, float x, float y) noexcept;
 
-    std::vector<std::vector<uint8_t>> get_value_array_from_expression(std::array<Expression, Expression_size> const & expression, size_t width, size_t height) noexcept;
+    std::vector<std::vector<uint8_t>> get_value_array_from_expression(std::array<Expression, Expression_size> const & expression, size_t width, size_t height, float step = 1.f) noexcept;
 }
