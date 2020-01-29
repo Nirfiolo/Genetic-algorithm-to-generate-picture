@@ -28,9 +28,10 @@ namespace ga_gp
             return true;
 
         case Expression::Sin:
-        case Expression::Cos:
         case Expression::Log:
         case Expression::Atan:
+        case Expression::Exp:
+        case Expression::Logis_1:
         {
             bool const result = is_correct_expression(expression, current);
             return result;
@@ -120,11 +121,6 @@ namespace ga_gp
             float const current_value = get_one_value();
             return sinf(current_value);
         }
-        case Expression::Cos:
-        {
-            float const current_value = get_one_value();
-            return cosf(current_value);
-        }
         case Expression::Log:
         {
             float const current_value = get_one_value();
@@ -134,6 +130,16 @@ namespace ga_gp
         {
             float const current_value = get_one_value();
             return atan(current_value);
+        }
+        case Expression::Exp:
+        {
+            float const current_value = get_one_value();
+            return exp(current_value);
+        }
+        case Expression::Logis_1:
+        {
+            float const current_value = get_one_value();
+            return 1.f / (1.f + exp(-current_value));
         }
 
         default:

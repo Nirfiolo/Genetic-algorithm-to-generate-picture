@@ -11,7 +11,7 @@ namespace ga_gp
 {
     enum class Expression : uint8_t
     {
-        Size = 11,
+        Size = 12,
 
         One = 0,
         Two = 1,
@@ -24,9 +24,10 @@ namespace ga_gp
         Mult = 6,
 
         Sin = 7,
-        Cos = 8,
-        Log = 9,   // log(|x| + 1.f)
-        Atan = 10
+        Log = 8,   // log(|x| + 1.f)
+        Atan = 9,
+        Exp = 10,
+        Logis_1 = 11    // 1 / (1 + e ^ -x)
 
         // TODO 
         // 1 / (1 + e ^ -x)

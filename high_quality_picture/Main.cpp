@@ -17,7 +17,7 @@ int main()
 
     float step = 1.f;
 
-    size_t current_expression = 16;
+    size_t current_expression = 17;
     std::string const file_name{ "../Data/expression" + std::to_string(current_expression) + ".dat" };
 
     std::ifstream file_in{ file_name };
