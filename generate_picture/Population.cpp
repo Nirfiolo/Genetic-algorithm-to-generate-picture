@@ -120,9 +120,7 @@ namespace ga_gp
         for (size_t i = 0; i < m_size; ++i)
         {
             float current_fitness = static_cast<float>(m_pre_fitness[i]);
-            current_fitness = std::max(FLT_EPSILON, current_fitness);
 
-            current_fitness = 1.f / current_fitness;
             sum += current_fitness;
 
             m_fitness[i] = current_fitness;

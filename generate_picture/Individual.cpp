@@ -27,42 +27,43 @@ namespace ga_gp
 
     void Individual::try_mutate(float probability) noexcept
     {
-        auto try_mutate = [probability](std::array<Expression, Expression_size> & expression) noexcept -> bool
+        auto try_mutate = [probability](std::array<Expression, Expression_size> & expression) noexcept
         {
-            std::array<Expression, Expression_size> new_expression = expression;
-
-            for (size_t i = 0; i < Expression_size; ++i)
+            for (size_t i = Expression_size - 1; i >= Expression_size / 2; --i)
             {
                 if (get_bool_with_probability(probability))
                 {
-                    new_expression[i] = get_rand_expression();
+                    expression[i] = get_rand_no_param_expression();
                 }
             }
 
-            bool const is_correct = is_correct_expression(new_expression);
-
-            if (is_correct)
+            for (size_t i = Expression_size / 2 - 1; i > 0; --i)
             {
-                expression = new_expression;
+                if (get_bool_with_probability(probability))
+                {
+                    if (get_bool_with_probability(0.6f))
+                    {
+                        expression[i] = get_rand_double_param_expression();
+                    }
+                    else
+                    {
+                        expression[i] = get_rand_single_param_expression();
+                    }
+                }
             }
-
-            return is_correct;
         };
 
         for (size_t i = 0; i < Color_type_count; ++i)
         {
-            while (!try_mutate(m_expressions[i]))
-            {
-
-            }
+            try_mutate(m_expressions[i]);
         }
     }
 
     Individual Individual::cross(Individual const & first, Individual const & second, float first_advantage) noexcept
     {
-        auto try_cross = [first_advantage](std::array<Expression, Expression_size> & new_expression,
+        auto cross = [first_advantage](std::array<Expression, Expression_size> & new_expression,
             std::array<Expression, Expression_size> const & first,
-            std::array<Expression, Expression_size> const & second) noexcept -> bool
+            std::array<Expression, Expression_size> const & second) noexcept
         {
             for (size_t i = 0; i < Expression_size; ++i)
             {
@@ -78,18 +79,13 @@ namespace ga_gp
 
                 new_expression[i] = new_expr;
             }
-
-            return is_correct_expression(new_expression);
         };
 
         std::array<std::array<Expression, Expression_size>, Color_type_count> new_expressions{};
 
         for (size_t i = 0; i < Color_type_count; ++i)
         {
-            while (!try_cross(new_expressions[i], first.m_expressions[i], second.m_expressions[i]))
-            {
-
-            }
+            cross(new_expressions[i], first.m_expressions[i], second.m_expressions[i]);
         }
 
         return Individual{ new_expressions };
@@ -97,37 +93,9 @@ namespace ga_gp
 
     void Individual::generate() noexcept
     {
-        auto try_generate = [](std::array<Expression, Expression_size> & expression) noexcept -> bool
-        {
-            for (Expression & expression : expression)
-            {
-                expression = get_rand_expression();
-            }
-
-            size_t const x_count = 10;
-            size_t const y_count = 10;
-
-            for (size_t i = 0; i < x_count; ++i)
-            {
-                size_t const index = get_rand_from_zero_to(Expression_size);
-                expression[index] = Expression::X;
-            }
-
-            for (size_t i = 0; i < y_count; ++i)
-            {
-                size_t const index = get_rand_from_zero_to(Expression_size);
-                expression[index] = Expression::Y;
-            }
-
-            return is_correct_expression(expression);
-        };
-
         for (size_t i = 0; i < Color_type_count; ++i)
         {
-            while (!try_generate(m_expressions[i]))
-            {
-
-            }
+            m_expressions[i] = get_rand_expression();
         }
     }
 

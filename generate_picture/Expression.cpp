@@ -1,72 +1,61 @@
 #include "Expression.h"
 
+#include "Common.h"
 
 #include <iostream>
 
 
 namespace ga_gp
 {
-    bool is_correct_expression(std::array<Expression, Expression_size> const & expression, size_t & current) noexcept
+    Expression get_rand_single_param_expression() noexcept
     {
-        if (current >= Expression_size)
-        {
-            return false;
-        }
-
-        Expression const current_expression = expression[current];
-
-        ++current;
-
-
-        switch (current_expression)
-        {
-        case Expression::One:
-        case Expression::Two:
-
-        case Expression::X:
-        case Expression::Y:
-            return true;
-
-        case Expression::Sin:
-        case Expression::Log:
-        case Expression::Atan:
-        case Expression::Exp:
-        case Expression::Logis_1:
-        {
-            bool const result = is_correct_expression(expression, current);
-            return result;
-        }
-
-        case Expression::Sum:
-        case Expression::Diff:
-        case Expression::Mult:
-        {
-            bool const first = is_correct_expression(expression, current);
-            bool const second = is_correct_expression(expression, current);
-            return first & second;
-        }
-
-        default:
-            std::cout << "Error: " << "Undefine Expression" << '\n';
-            return false;
-            break;
-        }
-    }
-
-    Expression get_rand_expression() noexcept
-    {
-        uint8_t const number = static_cast<uint8_t>(rand() % static_cast<uint8_t>(Expression::Size));
+        uint8_t const begin = static_cast<uint8_t>(Expression::BeginSingleParam) + 1;
+        uint8_t const end = static_cast<uint8_t>(Expression::EndSingleParam);
+        uint8_t const number = get_rand_from_to(begin, end);
         return static_cast<Expression>(number);
     }
 
-    bool is_correct_expression(std::array<Expression, Expression_size> const & expression) noexcept
+    Expression get_rand_double_param_expression() noexcept
     {
-        size_t current = 0;
-        return is_correct_expression(expression, current);
+        uint8_t const begin = static_cast<uint8_t>(Expression::BeginDoubleParam) + 1;
+        uint8_t const end = static_cast<uint8_t>(Expression::EndDoubleParam);
+        uint8_t const number = get_rand_from_to(begin, end);
+        return static_cast<Expression>(number);
     }
 
+    Expression get_rand_no_param_expression() noexcept
+    {
+        uint8_t const begin = static_cast<uint8_t>(Expression::BeginNoParam) + 1;
+        uint8_t const end = static_cast<uint8_t>(Expression::EndNoParam);
+        uint8_t const number = get_rand_from_to(begin, end);
+        return static_cast<Expression>(number);
+    }
 
-    float get_value(std::array<Expression, Expression_size> const & expression, size_t & current, float x, float y) noexcept
+    std::array<Expression, Expression_size> get_rand_expression() noexcept
+    {
+        std::array<Expression, Expression_size> expression;
+
+        for (size_t i = Expression_size - 1; i >= Expression_size / 2; --i)
+        {
+            expression[i] = get_rand_no_param_expression();
+        }
+
+        for (size_t i = Expression_size / 2 - 1; i > 0; --i)
+        {
+            if (get_bool_with_probability(0.6f))
+            {
+                expression[i] = get_rand_double_param_expression();
+            }
+            else
+            {
+                expression[i] = get_rand_single_param_expression();
+            }
+        }
+
+        return expression;
+    }
+
+    float get_value(std::array<Expression, Expression_size> const & expression, size_t current, float x, float y) noexcept
     {
         if (current >= Expression_size)
         {
@@ -74,27 +63,25 @@ namespace ga_gp
             return 0.f;
         }
 
-
         Expression const current_expression = expression[current];
         
-        ++current;
 
-        auto get_one_value = [&expression, &current, &x, &y]() noexcept -> float
+        auto get_one_value = [&expression, current, x, y]() noexcept -> float
         {
-            return get_value(expression, current, x, y);
+            return get_value(expression, 2 * current, x, y);
         };
 
-        auto get_two_value = [&expression, &current, &x, &y]() noexcept -> std::pair<float, float>
+        auto get_two_value = [&expression, current, x, y]() noexcept -> std::pair<float, float>
         {
-            float const a = get_value(expression, current, x, y);
-            float const b = get_value(expression, current, x, y);
+            float const a = get_value(expression, 2 * current, x, y);
+            float const b = get_value(expression, 2 * current + 1, x, y);
 
             return { a, b };
         };
 
         switch (current_expression)
         {
-        case Expression::One: return 1.f;
+        //case Expression::One: return 1.f;
         case Expression::Two: return 2.f;
         
         case Expression::X: return x;
@@ -115,31 +102,64 @@ namespace ga_gp
             std::pair<float, float> const current_value = get_two_value();
             return current_value.first * current_value.second;
         }
+        case Expression::Div:
+        {
+            std::pair<float, float> current_value = get_two_value();
+
+            float const eps = 0.0001f;
+            
+            if (abs(current_value.second) < eps)
+            {
+                current_value.second = (current_value.second < 0.f ? -1.f : 1.f) * eps;
+            }
+
+            return current_value.first / current_value.second;
+        }
 
         case Expression::Sin:
         {
             float const current_value = get_one_value();
             return sinf(current_value);
         }
+        case Expression::Cos:
+        {
+            float const current_value = get_one_value();
+            return cosf(current_value);
+        }
         case Expression::Log:
         {
             float const current_value = get_one_value();
-            return log(abs(current_value) + 1.f);
+            return logf(abs(current_value) + 1.f);
         }
         case Expression::Atan:
         {
             float const current_value = get_one_value();
-            return atan(current_value);
+            return atanf(current_value);
         }
         case Expression::Exp:
         {
             float const current_value = get_one_value();
-            return exp(current_value);
+            return expf(current_value);
         }
         case Expression::Logis_1:
         {
             float const current_value = get_one_value();
-            return 1.f / (1.f + exp(-current_value));
+            return 1.f / (1.f + expf(-current_value));
+        }
+        case Expression::Sqrt:
+        {
+            float const current_value = get_one_value();
+            return sqrtf(abs(current_value));
+        }
+        case Expression::Fun_1:
+        {
+            float const current_value = get_one_value();
+            return sinf(current_value) * current_value;
+        }
+        case Expression::Fun_2:
+        {
+            float const current_value = get_one_value();
+            return sinf(current_value) / current_value;
         }
 
         default:
@@ -152,8 +172,7 @@ namespace ga_gp
 
     float get_value(std::array<Expression, Expression_size> const & expression, float x, float y) noexcept
     {
-        size_t current = 0;
-        return get_value(expression, current, x, y);
+        return get_value(expression, 1, x, y);
     }
 
 
@@ -166,10 +185,10 @@ namespace ga_gp
         float min_value = INFINITY;
         float max_value = -INFINITY;
 
-        float y = 0.f;
+        float y = -0.5f * step * static_cast<float>(height);
         for (size_t i = 0; i < height; ++i, y += step)
         {
-            float x = 0.f;
+            float x = -0.5f * step * static_cast<float>(width);
             for (size_t j = 0; j < width; ++j, x += step)
             {
                 float const current = get_value(expression, x, y);

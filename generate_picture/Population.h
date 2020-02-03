@@ -68,7 +68,7 @@ namespace ga_gp
         static constexpr size_t Min_size{ 2 };
         static constexpr float To_next_evolution_coefficient{ 0.25f };
         static constexpr float To_new_pairs_coefficient{ 0.368f };
-        static constexpr float Mutate_coefficient{ 0.10f };
+        static constexpr float Mutate_coefficient{ 0.05f };
     };
 
 }

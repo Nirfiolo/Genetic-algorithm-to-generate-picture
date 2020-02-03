@@ -20,22 +20,24 @@ namespace ga_gp
         unsigned int const width = 200;
         unsigned int const height = 200;
 
+        float const step = 0.25f;
+
+        unsigned int const scale = 4;
+        float const scale_float = 0.25f;
+
         sf::Image image_1{};
         sf::Texture texture_1{};
         sf::Sprite sprite_1{};
-
-        sprite_1.setScale(4.f, 4.f);
 
         sf::Image image_2{};
         sf::Texture texture_2{};
         sf::Sprite sprite_2{};
 
-        sprite_2.setScale(4.f, 4.f);
         sprite_2.setPosition(900.f, 0.f);
 
 
 
-        size_t const population_size{ 15 };
+        size_t const population_size{ 18 };
 
         ga_gp::Population population{ population_size };
 
@@ -43,12 +45,10 @@ namespace ga_gp
         std::vector<sf::Texture> textures(population_size);
         std::vector<sf::Sprite> sprites(population_size);
 
-        float const scale = 1.f;
-
         std::vector<sf::Vector2f> positions(population_size);
         float const between = 300.f;
         size_t const rows = 3;
-        size_t const cols = 5;
+        size_t const cols = 6;
 
         size_t current = 0;
         for (size_t i = 0; i < cols; ++i)
@@ -61,30 +61,29 @@ namespace ga_gp
             }
         }
 
-        auto update_two_pictures = [&population, &image_1, &image_2, &texture_1,  &texture_2, &sprite_1, &sprite_2, &scale, &width, &height]() noexcept
+        auto update_two_pictures = [&population, &image_1, &image_2, &texture_1,  &texture_2, &sprite_1, &sprite_2, scale, scale_float, width, height, step]() noexcept
         {
             std::pair<Individual, Individual> const & individuals = population.get_pair();
 
-            image_1 = generate_image(width, height, individuals.first.get_points(width, height));
+            image_1 = generate_image(width * scale, height * scale, individuals.first.get_points(width * scale, height * scale, step * scale_float));
             texture_1.loadFromImage(image_1);
             sprite_1.setTexture(texture_1);
 
-            image_2 = generate_image(width, height, individuals.second.get_points(width, height));
+            image_2 = generate_image(width * scale, height * scale, individuals.second.get_points(width * scale, height * scale, step * scale_float));
             texture_2.loadFromImage(image_2);
             sprite_2.setTexture(texture_2);
             
         };
 
-        auto update_picture_list = [&population, &images, &textures, &sprites, &scale, &positions, &population_size, &width, &height]() noexcept
+        auto update_picture_list = [&population, &images, &textures, &sprites, &positions, population_size, width, height, step]() noexcept
         {
             std::vector<Individual> const & individuals = population.get_individuals();
 
             for (size_t i = 0; i < population_size; ++i)
             {
-                images[i] = generate_image(width, height, individuals[i].get_points(width, height));
+                images[i] = generate_image(width, height, individuals[i].get_points(width, height, step));
                 textures[i].loadFromImage(images[i]);
                 sprites[i].setTexture(textures[i]);
-                sprites[i].setScale(scale, scale);
                 sprites[i].setPosition(positions[i]);
             }
         };
